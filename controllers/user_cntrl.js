@@ -2,6 +2,7 @@ const User = require("../models/user_schema");
 const Ticket = require("../models/ticket_schema");
 const { hashPassword, comparePassword } = require("../utils/Auth");
 const jwt = require("jsonwebtoken");
+const sendError = require("../utils/Error");
 
 const RegisterAnyone = async (req, res) => {
   const { name, email, password, role, category } = req.body;
@@ -334,7 +335,15 @@ const getUsersWhoBreachedSecondSLA = async (req, res) => {
   }
 };
 
-
+// for manager and admin
+const AllUsers = async (req, res) => {
+  try {
+    const data = await User.find({}).select("-password");
+    res.json(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 module.exports = {
   RegisterAnyone,
@@ -350,4 +359,5 @@ module.exports = {
 
   getAgentsByMostTicketsSolved,
   getUsersWhoBreachedSecondSLA,
+  AllUsers
 };
