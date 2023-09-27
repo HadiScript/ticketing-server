@@ -42,7 +42,7 @@ const RegisterAnyone = async (req, res) => {
     return res.json({ ok: true });
   } catch (err) {
     console.log("failed error", err);
-    res.status(500).json({ err: "Error, Try again" });
+    res.status(500).json({ error: "Error, Try again" });
   }
 };
 
@@ -207,7 +207,7 @@ const GetAllUsers = async (req, res) => {
 
 const DeleteUser = async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete({ _id: req.params.id });
+    const user = await User.findByIdAndDelete({ _id: req.params._id });
     res.json({ ok: true });
   } catch (error) {
     console.log(error);
@@ -336,9 +336,33 @@ const getUsersWhoBreachedSecondSLA = async (req, res) => {
 };
 
 // for manager and admin
-const AllUsers = async (req, res) => {
+const AllClient = async (req, res) => {
   try {
-    const data = await User.find({}).select("-password");
+    const data = await User.find({ role: "client" }).select("-password");
+    res.json(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+const AllManager = async (req, res) => {
+  try {
+    const data = await User.find({ role: "manager" }).select("-password");
+    res.json(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+const AllAgent = async (req, res) => {
+  try {
+    const data = await User.find({ role: "agent" }).select("-password");
+    res.json(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+const AllAdmin = async (req, res) => {
+  try {
+    const data = await User.find({ role: "admin" }).select("-password");
     res.json(data);
   } catch (error) {
     console.log(error);
@@ -359,5 +383,8 @@ module.exports = {
 
   getAgentsByMostTicketsSolved,
   getUsersWhoBreachedSecondSLA,
-  AllUsers
+  AllClient,
+  AllAgent,
+  AllAdmin,
+  AllManager,
 };

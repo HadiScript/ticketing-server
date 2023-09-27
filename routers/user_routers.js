@@ -10,7 +10,10 @@ const {
   DeleteUser,
   getAgentsByMostTicketsSolved,
   getUsersWhoBreachedSecondSLA,
-  AllUsers,
+  AllClient,
+  AllAgent,
+  AllAdmin,
+  AllManager,
 } = require("../controllers/user_cntrl");
 const {
   loginReq,
@@ -29,10 +32,13 @@ router.post("/login", Login);
 router.get("/current-user", loginReq, currentUser);
 
 //
-router.get("/all-users", loginReq, AdminAndManager, AllUsers);
+router.get("/all-client", loginReq, AdminAndManager, AllClient);
+router.get("/all-agent", loginReq, AdminAndManager, AllAgent);
+router.get("/all-manager", loginReq, isAdmin, AllManager);
+router.get("/all-admin", loginReq, isAdmin, AllAdmin);
 
 // for login users
-router.post("/update-user", loginReq, updateUserByUser);
+router.put("/update-user", loginReq, updateUserByUser);
 
 router.get("/current-client", loginReq, currentUser);
 router.get("/current-agent", loginReq, isAgent, currentUser);
@@ -46,7 +52,7 @@ adminRoutes.get("/get-users", GetAllUsers);
 adminRoutes.get("/who/solved/most", getAgentsByMostTicketsSolved);
 adminRoutes.get("/who/breached/2/sla", getUsersWhoBreachedSecondSLA);
 adminRoutes.post("/update-user", UpdateUserByAdmin);
-adminRoutes.delete("/delete-users", DeleteUser);
+adminRoutes.delete("/delete-users/:_id", DeleteUser);
 
 router.use("/by/auth", loginReq, AdminAndManager, adminRoutes);
 

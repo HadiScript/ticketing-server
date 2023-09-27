@@ -41,9 +41,10 @@ const createTicketByClient = async (req, res) => {
     await newTicket.save();
 
     // Send success response
-    return res
-      .status(201)
-      .json({ message: "Ticket created successfully", ticket: newTicket });
+    return res.status(201).json({
+      ok: true,
+      message: "Ticket created successfully",
+    });
   } catch (error) {
     console.error("Error creating ticket:", error);
     return sendError(res);
@@ -91,6 +92,7 @@ const pickTicket = async (req, res) => {
 
     ticket.pickedBy = req.user._id;
     ticket.pickedAt = currentTime;
+    ticket.status = "In Progress";
     await ticket.save();
 
     return res.status(200).json({
@@ -153,6 +155,18 @@ const addCommentToTicket = async (req, res) => {
       message: "Comment added successfully",
       ticket: ticket,
     });
+  } catch (error) {
+    console.error("Error adding comment:", error);
+    return sendError(res);
+  }
+};
+
+const pickedByMe = async (req, res) => {
+  try {
+    const tickets = await Ticket.find({ pickedBy: req.user._id }).populate(
+      "comments"
+    );
+    return res.status(200).json({ ok: true, tickets });
   } catch (error) {
     console.error("Error adding comment:", error);
     return sendError(res);
@@ -317,12 +331,27 @@ const gettingAllTickets = async (req, res) => {
   const { status } = req.body;
 
   try {
-    if (!status) return sendError(res, "Please select the ticket status", 400);
+    // if (!status) return sendError(res, "Please select the ticket status", 400);
     const tickets = await Ticket.find({
       createdBy: req.user._id,
-      status,
-    });
-    return res.json(tickets);
+      status: "Open",
+    }).populate("category");
+    return res.json({ tickets, ok: true });
+  } catch (error) {
+    console.log(error);
+    sendError(res);
+  }
+};
+
+const gettingTicketsByCategory = async (req, res) => {
+  try {
+    const agent = await User.findById(req.user._id);
+    const tickets = await Ticket.find({
+      category: agent.category,
+      status: "Open",
+    }).populate("category");
+
+    res.json({ ok: true, tickets });
   } catch (error) {
     console.log(error);
     sendError(res);
@@ -337,4 +366,6 @@ module.exports = {
   escalateTicketByAgent,
   escalateTicketByManager,
   gettingAllTickets,
+  gettingTicketsByCategory,
+  pickedByMe,
 };
