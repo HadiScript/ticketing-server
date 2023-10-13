@@ -25,14 +25,15 @@ const ticketSchema = new mongoose.Schema({
   },
   pickedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   pickedAt: { type: Date }, // Timestamp when ticket is picked up
-  assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
   images: [{ type: String }],
-  escalated: [
+
+  movements: [
     {
       yes: { type: Boolean, default: false },
+      status: { type: String }, //escalated or handover
       why: { type: String },
-      escalatedTo: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      movedTo: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
       escalatedAt: { type: Date, default: Date.now }, // Timestamp when escalated
     },
   ],

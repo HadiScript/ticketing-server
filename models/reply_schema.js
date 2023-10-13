@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const commentSchema = new mongoose.Schema({
+const replySchema = new mongoose.Schema({
   content: { type: String, required: true },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
@@ -8,7 +8,7 @@ const commentSchema = new mongoose.Schema({
     required: true,
   },
   createdAt: { type: Date, default: Date.now },
-  replies: [{ type: mongoose.Schema.Types.ObjectId, ref: "Reply" }],
+  commentId: { type: mongoose.Schema.Types.ObjectId, ref: "Comment" },
 });
 
-module.exports = mongoose.model("Comment", commentSchema);
+module.exports = mongoose.model("Reply", replySchema);

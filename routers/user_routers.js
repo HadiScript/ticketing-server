@@ -31,7 +31,7 @@ router.post("/register", RegisterForClient);
 router.post("/login", Login);
 router.get("/current-user", loginReq, currentUser);
 
-//
+//localhost:9000/api/all-client
 router.get("/all-client", loginReq, AdminAndManager, AllClient);
 router.get("/all-agent", loginReq, AdminAndManager, AllAgent);
 router.get("/all-manager", loginReq, isAdmin, AllManager);
