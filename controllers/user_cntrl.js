@@ -3,6 +3,7 @@ const Ticket = require("../models/ticket_schema");
 const { hashPassword, comparePassword } = require("../utils/Auth");
 const jwt = require("jsonwebtoken");
 const sendError = require("../utils/Error");
+const mongoose = require("mongoose");
 
 const RegisterAnyone = async (req, res) => {
   const { name, email, password, role, category } = req.body;
@@ -369,6 +370,41 @@ const AllAdmin = async (req, res) => {
   }
 };
 
+const availableUsersForHandoverTickets = async (req, res) => {
+  try {
+    // 1. Get Current User and Category
+    const currentUser = await User.findById(req.user._id);
+    const userCategory = currentUser.category;
+
+    // 2. Get All Agents in the Category
+    const agentsInCategory = await User.find({
+      role: "agent",
+      category: userCategory,
+    });
+
+    const agentsWithFewPicks = [];
+
+    // 3. Count Tickets per Agent and 4. Filter Agents
+    for (let agent of agentsInCategory) {
+      const ticketCount = await Ticket.countDocuments({
+        pickedBy: agent._id,
+        // add additional conditions if needed, e.g., only considering 'open' tickets etc.
+      });
+
+      if (ticketCount <= 5) {
+        agent.password = undefined;
+        agentsWithFewPicks.push(agent);
+      }
+    }
+
+    // Respond with the filtered agents
+    res.status(200).json({ ok: true, agents: agentsWithFewPicks });
+  } catch (error) {
+    console.error("Error fetching agents:", error);
+    return res.status(500).json({ ok: false, error: "Internal Server Error" });
+  }
+};
+
 module.exports = {
   RegisterAnyone,
   RegisterForClient,
@@ -387,4 +423,6 @@ module.exports = {
   AllAgent,
   AllAdmin,
   AllManager,
+
+  availableUsersForHandoverTickets,
 };

@@ -14,14 +14,9 @@ const {
   AllAgent,
   AllAdmin,
   AllManager,
+  availableUsersForHandoverTickets,
 } = require("../controllers/user_cntrl");
-const {
-  loginReq,
-  isAdmin,
-  AdminAndManager,
-  isAgent,
-  isManager,
-} = require("../middlewares/auths");
+const { loginReq, isAdmin, AdminAndManager, isAgent, isManager, HandoverRights } = require("../middlewares/auths");
 const User = require("../models/user_schema");
 
 const router = express.Router();
@@ -33,7 +28,7 @@ router.get("/current-user", loginReq, currentUser);
 
 //localhost:9000/api/all-client
 router.get("/all-client", loginReq, AdminAndManager, AllClient);
-router.get("/all-agent", loginReq, AdminAndManager, AllAgent);
+router.get("/all-agent", loginReq, AllAgent);
 router.get("/all-manager", loginReq, isAdmin, AllManager);
 router.get("/all-admin", loginReq, isAdmin, AllAdmin);
 
@@ -55,6 +50,8 @@ adminRoutes.post("/update-user", UpdateUserByAdmin);
 adminRoutes.delete("/delete-users/:_id", DeleteUser);
 
 router.use("/by/auth", loginReq, AdminAndManager, adminRoutes);
+
+router.get("/available-agents", loginReq, HandoverRights, availableUsersForHandoverTickets);
 
 // getAgentsByMostTicketsSolved
 // getUsersWhoBreachedSecondSLA

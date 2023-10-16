@@ -4,10 +4,7 @@ const User = require("../models/user_schema");
 const loginReq = async (req, res, next) => {
   let token;
 
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
+  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
     try {
       token = req.headers.authorization.split(" ")[1];
 
@@ -81,10 +78,49 @@ const isManager = async (req, res, cb) => {
   }
 };
 
+const HandoverRights = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    switch (user.role) {
+      case "admin":
+        next();
+        break;
+      case "manager":
+        next();
+        break;
+      case "agent":
+        next();
+        break;
+      default:
+        return res.status(403).send("Unauhorized");
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const isClient = async (req, res, cb) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (user.role !== "client") {
+      return res.status(400).send("Unathorized");
+    } else {
+      cb();
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+
+
 module.exports = {
   loginReq,
   isAdmin,
   AdminAndManager,
   isAgent,
   isManager,
+  HandoverRights,
+  isClient,
 };

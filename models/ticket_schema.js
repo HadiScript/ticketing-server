@@ -18,6 +18,11 @@ const ticketSchema = new mongoose.Schema({
     enum: ["Open", "In Progress", "Resolved", "Reopened"],
     default: "Open",
   },
+  resolvedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
+
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
@@ -30,10 +35,10 @@ const ticketSchema = new mongoose.Schema({
 
   movements: [
     {
-      yes: { type: Boolean, default: false },
-      status: { type: String }, //escalated or handover
-      why: { type: String },
-      movedTo: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      yes: { type: Boolean, default: false }, //true
+      status: { type: String }, //escalated 
+      why: { type: String }, //reason
+      movedTo: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, //escalate
       escalatedAt: { type: Date, default: Date.now }, // Timestamp when escalated
     },
   ],
