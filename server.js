@@ -16,11 +16,13 @@ app.use(express.json());
 const userRouters = require("./routers/user_routers");
 const categoryRouters = require("./routers/category_routers");
 const ticketRouters = require("./routers/ticket_routers");
+const dashboardRouters = require("./routers/dashboard_routers");
 
 // all routes - APIS
 app.use("/api", userRouters);
 app.use("/api", categoryRouters);
 app.use("/api", ticketRouters);
+app.use("/api", dashboardRouters);
 
 // for example
 // http://localhost:9000/api/register/a/user

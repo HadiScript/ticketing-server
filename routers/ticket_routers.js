@@ -26,6 +26,7 @@ const {
   getTicketsAssignToMe,
   clientResolvedTicket,
   ticketByIdClient,
+  getAllAssignedTickets,
 } = require("../controllers/tickets_cntrl");
 
 const router = express.Router();
@@ -58,5 +59,6 @@ router.get("/assign-to-me", loginReq, isAgent, getTicketsAssignToMe);
 router.put("/resolved-tc/:ticketId", loginReq, isAgent, updateTicketStatusToResolved);
 router.get("/my-resolved", loginReq, isAgent, gettingAllResolvedTickets);
 router.get("/resolved-tickets", loginReq, isClient, clientResolvedTicket);
+router.get('/all-assign-tickets', loginReq, AdminAndManager, getAllAssignedTickets)
 
 module.exports = router;

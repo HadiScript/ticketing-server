@@ -158,6 +158,7 @@ const pickedByMe = async (req, res) => {
   try {
     const tickets = await Ticket.find({
       pickedBy: req.user._id,
+      status: "In Progress",
       movements: {
         $not: {
           $elemMatch: {
@@ -586,9 +587,11 @@ const assignTicket = async (req, res) => {
 
 const gettingAllEscalatingTickets = async (req, res) => {
   try {
-    // Fetch all tickets that have been escalated
+    // Fetch all tickets that have been escalated but not assigned
     const escalatedTickets = await Ticket.find({
       "movements.status": "escalated",
+      "movements.status": { $nin: ["assign"] },
+      status: "In Progress",
     })
       .populate("pickedBy", "name email")
       .populate("createdBy", "name email");
@@ -729,6 +732,25 @@ const clientResolvedTicket = async (req, res) => {
   }
 };
 
+const getAllAssignedTickets = async (req, res) => {
+  try {
+    const tickets = await Ticket.find({
+      "movements.status": "assign",
+      status: "In Progress",
+      // Uncomment the line below if you only want to fetch tickets assigned to a specific agent
+      // "movements.movedTo": mongoose.Types.ObjectId(agentId)
+    })
+      .populate("createdBy", "_id name email") // Populate the 'username' of the user who created the ticket
+      .populate("movements.movedTo", "-password") // Populate the 'username' of the agent to whom the ticket was assigned
+      .populate("category"); // Populate the category of the ticket
+
+    res.status(200).json({ ok: true, tickets });
+  } catch (error) {
+    console.error("Error fetching assigned tickets:", error);
+    return res.status(500).json({ ok: false, error: "Internal Server Error" });
+  }
+};
+
 module.exports = {
   createTicketByClient,
   pickTicket,
@@ -754,4 +776,5 @@ module.exports = {
   getTicketsAssignToMe,
   clientResolvedTicket,
   ticketByIdClient,
+  getAllAssignedTickets,
 };

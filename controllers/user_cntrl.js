@@ -388,6 +388,7 @@ const availableUsersForHandoverTickets = async (req, res) => {
     for (let agent of agentsInCategory) {
       const ticketCount = await Ticket.countDocuments({
         pickedBy: agent._id,
+        status : ["Open", "In Progress"]
         // add additional conditions if needed, e.g., only considering 'open' tickets etc.
       });
 
